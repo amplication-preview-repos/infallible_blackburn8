@@ -1,0 +1,83 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  assignedTo              Employee?         @relation(fields: [taskEmployeeId], references: [id])
+  taskEmployeeId          String?
+  createdAt               DateTime          @default(now())
+  deadline                DateTime?
+  dependencies            Json?
+  description             String?
+  estimatedTimeToComplete Json?
+  id                      String            @id @default(cuid())
+  priority                EnumTaskPriority?
+  project                 Project?          @relation(fields: [tasProjectId], references: [id])
+  tasProjectId            String?
+  status                  EnumTaskStatus?
+  title                   String?
+  updatedAt               DateTime          @updatedAt
+}
+
+model AiAgent {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String?
+  role      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Department {
+  createdAt        DateTime   @default(now())
+  description      String?
+  employees        Employee[]
+  headOfDepartment String?
+  id               String     @id @default(cuid())
+  name             String?
+  updatedAt        DateTime   @updatedAt
+}
+
+model Project {
+  createdAt     DateTime           @default(now())
+  createdBy     Employee[]
+  description   String?
+  id            String             @id @default(cuid())
+  identifier    String?
+  name          String?
+  status        EnumProjectStatus?
+  statusDetails String?
+  tasks         Task[]
+  timeline      Json?
+  updatedAt     DateTime           @updatedAt
+}
+
+model Employee {
+  assignedTo   Project[]
+  createdAt    DateTime    @default(now())
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+  email        String      @unique
+  firstName    String?
+  id           String      @id @default(cuid())
+  lastName     String?
+  phoneNumber  String?
+  tasks        Task[]
+  updatedAt    DateTime    @updatedAt
+}
+
+enum EnumTaskPriority {
+  Option1
+}
+
+enum EnumTaskStatus {
+  Option1
+}
+
+enum EnumProjectStatus {
+  Option1
+}
